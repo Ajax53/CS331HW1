@@ -403,3 +403,90 @@ struct Successor depthSuccessor(Node* parent){
 
     return succ;
 }
+
+struct Successor astarSuccessor(Node* parent, Node goalNode){
+    struct Successor succ; //return successors
+    int lc, lw, lb, rc, rw, rb; //Temp values
+
+    //Move one chicken
+    lc = parent->lChickens - (parent->lBoats) + (parent->rBoats);
+    lw = parent->lWolves;
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens + (parent->lBoats) - (parent->rBoats);
+    rw = parent->rWolves;
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.c = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
+        succ.c.priority += astarHeuristic(succ.c, goalNode);
+    }
+    else{
+        succ.c = Node();
+    }
+
+    //Move two chickens
+    lc = parent->lChickens - 2*(parent->lBoats) + 2*(parent->rBoats);
+    lw = parent->lWolves;
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens + 2*(parent->lBoats) - 2*(parent->rBoats);
+    rw = parent->rWolves;
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.cc = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
+        succ.c.priority += astarHeuristic(succ.c, goalNode);
+    }
+    else{
+        succ.cc = Node();
+    }
+
+    //Move  one wolf
+    lc = parent->lChickens;
+    lw = parent->lWolves - (parent->lBoats) + (parent->rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens;
+    rw = parent->rWolves + (parent->lBoats) - (parent->rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.w = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
+        succ.c.priority += astarHeuristic(succ.c, goalNode);
+    }
+    else{
+        succ.w = Node();
+    }
+
+    //Move one chicken, one wolf
+    lc = parent->lChickens - (parent->lBoats) + (parent->rBoats);
+    lw = parent->lWolves - (parent->lBoats) + (parent->rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens + (parent->lBoats) - (parent->rBoats);
+    rw = parent->rWolves + (parent->lBoats) - (parent->rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.wc =  Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
+        succ.c.priority += astarHeuristic(succ.c, goalNode);
+    }
+    else{
+        succ.wc =  Node();
+    }
+
+    //Move  two wolf
+    lc = parent->lChickens;
+    lw = parent->lWolves - 2*(parent->lBoats) + 2*(parent->rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens;
+    rw = parent->rWolves + 2*(parent->lBoats) - 2*(parent->rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.ww = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
+        succ.c.priority += astarHeuristic(succ.c, goalNode);
+    }
+    else{
+        succ.ww = Node();
+    }
+
+    return succ;
+}
