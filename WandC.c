@@ -60,6 +60,9 @@ struct Successor astarSuccessor(Node parent);
 
 //A single is goal node
 //     bool matches(Node n, Node g)
+bool isGoal(Node checkNode, Node goalNode);
+
+int astarHeuristic(Node checkNode, Node goalNode);
 
 int main(int argc, char** argv) {
      if (argc != 5) {
@@ -94,7 +97,7 @@ int main(int argc, char** argv) {
      Node goalNode(leftChars, rightChars);
      fclose(filePointer);
 
-     //Switch on the modde
+     //Switch on the mode
      switch (argv[3][0]) {
 	  case 'b':
 	       fprintf(stdout, "BFS!\n");
@@ -212,5 +215,27 @@ std::string bfsEval(Node initialNode, Node goalNode) {
      return returnString;
 }
 
+
+int astarHeuristic(Node checkNode, Node goalNode){
+    int diff = 0;
+
+    // Add all differences betweeen the two node states
+    diff += abs(goalNode.lChickens - checkNode.lChickens);
+    diff += abs(goalNode.lWolves - checkNode.lWolves);
+    diff += abs(goalNode.lBoats - checkNode.lBoats);
+    diff += abs(goalNode.rChickens - checkNode.rChickens);
+    diff += abs(goalNode.rWolves - checkNode.rWolves);
+    diff += abs(goalNode.rBoats - checkNode.rBoats);
+
+return diff;
+}
+
+bool isGoal(Node checkNode, Node goalNode){
+    //Check differences between states
+    if (astarHeuristic(checkNode, goalNode) == 0)
+        return true;
+    else
+        return false;
+}
 
 //  fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
