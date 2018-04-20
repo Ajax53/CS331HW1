@@ -1,0 +1,47 @@
+A search problem has 5 components:
+	A finte set of states S
+	A non-empty set of initial states I in S
+	A non-empty set of goal states G in S
+	A successor funciton succ(s) which takes a state
+		s as input and returns as output the set of states 
+		you can reach from state s in one step.
+	A cost function cost(s, s') which returns the non-negative 
+		one-step cost of travelling from state s to s'.
+		The cost function is only defined is s' is a successor
+		to state s.
+
+All of the above five we should have implemented in some way except for the last
+one. For the wolves and chickens problem the "cost" of moving between states is 
+a constant for all moves. The only real restiction that we have is on which
+states are successors to other states. 
+
+Start with the initial state.
+Is the initial state the goal?
+If yes return solution. 
+If no apply the successor function.
+
+Successor function adds all nodes into a queue called the fringe. 
+The fringe holds all nodes that HAVE NOT YET BEEN EXPANDED.
+
+Remove a node from the queue. If it is a goal return the solution. 
+Otherwise call successor on it and put the results in the queue and repeat. 
+
+AVOID REPEATED STATES
+
+Breadth First the fringe queue is FIFO
+Depth First the queue is LIFO
+IDDFS is depth first with an increasing depth limit
+
+A* is a better alternative to greedy best-first search.
+Evaluation function is f(n) = g(n) + h(n)
+	where g(n) = path cost from the start node to n
+	If h(n) satisifes certain conditions, A* seach is optimal and complete
+
+A consistent heuristic is also admissible
+	Consistent heuristic is defined as 
+	h(n) <= c(n, a, n') + h(n')
+	Where n is a starting state n' is the state you are moveing to. 
+	And c(n, a, n') is the cost of moving from n to n' using action a.
+
+I think this means that we should be able to have h() always return 0 because our cost
+from moving to any node is always 1. 
