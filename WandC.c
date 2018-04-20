@@ -59,8 +59,8 @@ std::string astarEval(Node initialNode, Node goalNode);
 //two successor functions.
 //     Returns the nodes that can be reached from a given node.
 //     This will return a Successor struct
-//     We found that the only difference is the priority assigned to 
-//     the nodes which is just depth in the first three cases. 
+//     We found that the only difference is the priority assigned to
+//     the nodes which is just depth in the first three cases.
 
 struct Successor depthSuccessor(Node *parent);
 struct Successor astarSuccessor(Node *parent, Node goalNode);
@@ -397,7 +397,7 @@ struct iterativeDeepening iddfsEval(Node initialNode, Node goalNode, int depthLi
      returnStruct.value = returnString;
      returnStruct.nodesExpanded = oldValues.nodesExpanded + nodesExpanded;
      returnStruct.finished = true;
-     
+
      return returnStruct;
 }
 
@@ -598,7 +598,7 @@ struct Successor astarSuccessor(Node* parent, Node goalNode){
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
         succ.cc = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
-        succ.c.priority += astarHeuristic(succ.c, goalNode);
+        succ.cc.priority += astarHeuristic(succ.cc, goalNode);
     }
     else{
         succ.cc = Node();
@@ -614,7 +614,7 @@ struct Successor astarSuccessor(Node* parent, Node goalNode){
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
         succ.w = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
-        succ.c.priority += astarHeuristic(succ.c, goalNode);
+        succ.w.priority += astarHeuristic(succ.w, goalNode);
     }
     else{
         succ.w = Node();
@@ -630,7 +630,7 @@ struct Successor astarSuccessor(Node* parent, Node goalNode){
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
         succ.wc =  Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
-        succ.c.priority += astarHeuristic(succ.c, goalNode);
+        succ.wc.priority += astarHeuristic(succ.wc, goalNode);
     }
     else{
         succ.wc =  Node();
@@ -646,7 +646,7 @@ struct Successor astarSuccessor(Node* parent, Node goalNode){
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
         succ.ww = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
-        succ.c.priority += astarHeuristic(succ.c, goalNode);
+        succ.ww.priority += astarHeuristic(succ.ww, goalNode);
     }
     else{
         succ.ww = Node();
