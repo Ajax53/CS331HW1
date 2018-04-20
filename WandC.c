@@ -1,6 +1,7 @@
 #include <vector> //For the priority queue generation
 #include <queue>  //For the priority queue generation
 #include <cstdio> //For fprintf and FILE* streams. 
+#include <string> //For the toString function. And generally passing things around. 
 
 class Node {
      public:
@@ -12,6 +13,7 @@ class Node {
 	  int rBoats;
 	  Node* parent;
 	  int priority;
+	  string toString();
 };
 
 //Four evaluation functions.
