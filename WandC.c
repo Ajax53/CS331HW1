@@ -17,7 +17,7 @@ class Node {
 	  int rBoats;
 	  Node* parent;
 	  int priority;
-	  string toString();
+	  std::string toString();
 };
 
 //Four evaluation functions.
@@ -48,6 +48,9 @@ int main(int argc, char** argv) {
      }
      fgets(tempArray, 100, filePointer);
      Node goalNode(tempArray);
+
+     fprintf(stdout, "%s\n%s\n", initNode.toString(), goalNode.toString());
+
 
      //Switch on the modde
      //     BFS
@@ -94,5 +97,10 @@ Node::Node(char tempArray[100]) {
      rBoats = 0;
      parent = NULL;
      priority = 0;
+}
+
+string Node::toString() {
+     std::string s(lChickens, ",", lWolves, ",", lBoats, "\n", rChickens, ",", rWolves, ",", rBoats);
+     return s;
 }
 
