@@ -50,13 +50,13 @@ std::string dfsEval(Node initialNode, Node goalNode);
 std::string iddfsEval(Node initialNode, Node goalNode);
 std::string astarEval(Node initialNode, Node goalNode);
 
-//Four successor functions.
+//two successor functions.
 //     Returns the nodes that can be reached from a given node.
 //     This will return a Successor struct
+//     We found that the only difference is the priority assigned to 
+//     the nodes which is just depth in the first three cases. 
 
 struct Successor depthSuccessor(Node *parent);
-struct Successor dfsSuccessor(Node *parent);
-struct Successor iddfsSuccessor(Node *parent);
 struct Successor astarSuccessor(Node *parent);
 
 //A single is goal node
@@ -248,21 +248,11 @@ std::string bfsEval(Node initialNode, Node goalNode) {
 	           struct Successor s = depthSuccessor(tempNode);
 	           expandedNodes[tempNode->toString()] = tempNode;
 
-	           if (s.c.exists) {
-                   fringe.push(s.c);
-               }
-	           if (s.cc.exists) {
-                   fringe.push(s.cc);
-               }
-	           if (s.w.exists) {
-                   fringe.push(s.w);
-               }
-	           if (s.wc.exists) {
-                   fringe.push(s.wc);
-               }
-	           if (s.ww.exists) {
-                   fringe.push(s.ww);
-               }
+	           if (s.c.exists) fringe.push(s.c);
+	           if (s.cc.exists) fringe.push(s.cc);
+	           if (s.w.exists) fringe.push(s.w);
+	           if (s.wc.exists) fringe.push(s.wc);
+	           if (s.ww.exists) fringe.push(s.ww);
 	       }
 
            if (fringe.empty()) {
@@ -286,6 +276,111 @@ std::string bfsEval(Node initialNode, Node goalNode) {
      return returnString;
 }
 
+std::string dfsEval(Node initialNode, Node goalNode) {
+     std::string returnString("");
+     int nodesExpanded = 0, solutionLength;
+
+     //Make the expanded nodes map
+     std::map<std::string, Node*> expandedNodes;
+
+     //Make the priority queue.
+     std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(dfsCmp);
+
+     //loop over the priority queue until we find a solution on the queue.
+     fringe.push(initialNode);
+
+     while (!isGoal(fringe.top(), goalNode)) {
+          Node *tempNode = new Node(fringe.top());
+          fringe.pop();
+
+          if (expandedNodes.find(tempNode->toString()) == expandedNodes.end()) {
+               nodesExpanded++;
+	           struct Successor s = depthSuccessor(tempNode);
+	           expandedNodes[tempNode->toString()] = tempNode;
+
+	           if (s.c.exists) fringe.push(s.c);
+	           if (s.cc.exists) fringe.push(s.cc);
+	           if (s.w.exists) fringe.push(s.w);
+	           if (s.wc.exists) fringe.push(s.wc);
+	           if (s.ww.exists) fringe.push(s.ww);
+	       }
+
+           if (fringe.empty()) {
+                returnString += "No solution found\nNodes expanded: ";
+                returnString += std::to_string(nodesExpanded);
+                return returnString;
+           }
+     }
+
+     Node tempNode = fringe.top();
+
+     solutionLength = tempNode.depth + 1;
+     returnString += tempNode.getPathString();
+
+     returnString += "\nnodes expanded: ";
+     returnString += std::to_string(nodesExpanded);
+     returnString += "\nnodes in solution: ";
+     returnString += std::to_string(solutionLength);
+     returnString += "\n";
+
+     return returnString;
+}
+
+std::string iddfsEval(Node initialNode, Node goalNode) {
+     std::string returnString("");
+     int nodesExpanded = 0, solutionLength;
+     int depthLimit = 0;
+
+     //Make the expanded nodes map
+     std::map<std::string, Node*> expandedNodes;
+
+     //Make the priority queue.
+     std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(dfsCmp);
+
+     //loop over the priority queue until we find a solution on the queue.
+     fringe.push(initialNode);
+
+     while (!isGoal(fringe.top(), goalNode)) {
+          Node *tempNode = new Node(fringe.top());
+          fringe.pop();
+
+          if (expandedNodes.find(tempNode->toString()) == expandedNodes.end()) {
+               nodesExpanded++;
+	           struct Successor s = depthSuccessor(tempNode);
+	           expandedNodes[tempNode->toString()] = tempNode;
+
+	           if (s.c.exists && s.c.depth <= depthLimit) fringe.push(s.c);
+	           if (s.cc.exists && s.cc.depth<= depthLimit) fringe.push(s.cc);
+	           if (s.w.exists && s.w.depth <= depthLimit) fringe.push(s.w);
+	           if (s.wc.exists && s.wc.depth <= depthLimit) fringe.push(s.wc);
+	           if (s.ww.exists && s.ww.depth <= depthLimit) fringe.push(s.ww);
+	       }
+
+           if (fringe.empty()) {
+                depthLimit++;
+                expandedNodes.clear();
+           }
+           
+           if (depthLimit == 20000) {
+                returnString += "No solution found\nNodes expanded: ";
+                returnString += std::to_string(nodesExpanded);
+                return returnString;
+           }
+     }
+
+     Node tempNode = fringe.top();
+
+     solutionLength = tempNode.depth + 1;
+     returnString += tempNode.getPathString();
+
+     returnString += "\nnodes expanded: ";
+     returnString += std::to_string(nodesExpanded);
+     returnString += "\nnodes in solution: ";
+     returnString += std::to_string(solutionLength);
+     returnString += "\n";
+
+     return returnString;
+}
 
 int astarHeuristic(Node checkNode, Node goalNode){
     int diff = 0;
