@@ -43,6 +43,7 @@ struct Successor {
 //Four successor functions.
 //     Returns the nodes that can be reached from a given node.
 //     This will return a Successor type
+Successor bfsSucc(Node originNode);
 
 //A single is goal node
 //     bool matches(Node n, Node g)
@@ -79,7 +80,7 @@ int main(int argc, char** argv) {
 
      fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
 
-    
+
      //Switch on the modde
      //     BFS
      //          call BFSEval
