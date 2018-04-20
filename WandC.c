@@ -1,12 +1,11 @@
 #include <vector>  //For the priority queue generation
 #include <queue>   //For the priority queue generation
 #include <cstdio>  //For fprintf and FILE* streams.
-//#include <stdio.h> //For strtok this is cstdio
-//#include <string.h> //For strtok this is cstring
 #include <cstdio>  //For fprintf and FILE* streams.
-#include <cstring> //For the strtok. In c++ you want to include these instead of .h files
+#include <cstring> //For the strtok.
 #include <string>  //For the toString function. And generally passing things around.
 #include <map>     //For the already expanded nodes container.
+#include <functional> //For the comparator functions for the priority queue
 
 class Node {
      public:
@@ -23,6 +22,8 @@ class Node {
 	  int rBoats;
 	  Node* parent;
 	  int priority;
+	  int depth;
+
 	  std::string toString();
 };
 
@@ -34,24 +35,46 @@ struct Successor {
      Node ww;
 };
 
+//Comparison functions
+bool bfsCmp(Node lhs, Node rhs) { return lhs.depth < rhs.depth; }
+bool dfsCmp(Node lhs, Node rhs) { return lhs.depth > rhs.depth; }
+
 //Four evaluation functions.
 //     Returning a string that represents the path to the optimal solution.
 //     The returned string should be a composition of all of the toStrings
 //     from the found goal node all the way back up to the root node.
-//     Expanded node list maps std::string to Node[5]
+//     Expanded node list maps std::string to Node[5] (struct Successor)
+std::string bfsEval(Node initialNode, Node goalNode);
+std::string dfsEval(Node initialNode, Node goalNode);
+std::string iddfsEval(Node initialNode, Node goalNode);
+std::string astarEval(Node initialNode, Node goalNode);
 
 //Four successor functions.
 //     Returns the nodes that can be reached from a given node.
-//     This will return a Successor type
-Successor bfsSucc(Node originNode);
+//     This will return a Successor struct
+
+struct Successor bfsSuccessor(Node *parent);
+struct Successor dfsSuccessor(Node *parent);
+struct Successor iddfsSuccessor(Node *parent);
+struct Successor astarSuccessor(Node *parent);
 
 //A single is goal node
 //     bool matches(Node n, Node g)
 bool isGoal(Node checkNode, Node goalNode);
 
+//Heuristic function for a-star search
 int astarHeuristic(Node checkNode, Node goalNode);
 
+//isValid function determines whether a node is a valid next move
+bool isValid(Node parent, int lc, int lw, int lb, int rc, int rw, int rb);
+
 int main(int argc, char** argv) {
+     if (argc != 5) {
+     	fprintf(stdout, "Please enter the WandC command in the following format:\n");
+	fprintf(stdout, "\tWandC <initial state file> <goal state file> <mode> <output file>\n");
+	return 1;
+     }
+
      FILE * filePointer;
      char leftChars[50];
      char rightChars[50];
@@ -78,19 +101,26 @@ int main(int argc, char** argv) {
      Node goalNode(leftChars, rightChars);
      fclose(filePointer);
 
-     fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
+     //Switch on the mode
+     switch (argv[3][0]) {
+	  case 'b':
+	       fprintf(stdout, "BFS!\n");
+	       break;
+	  case 'd':
+	       fprintf(stdout, "DFS!\n");
+	       break;
+	  case 'i':
+               fprintf(stdout, "IDDFS!\n");
+	       break;
+	  case 'a':
+	       fprintf(stdout, "ASTAR!\n");
+	       break;
+	  default:
+	       fprintf(stdout, "Please enter a valid mode. (bfs, dfs, iddfs, astar)\n");
+     }
 
-
-     //Switch on the modde
-     //     BFS
-     //          call BFSEval
-     //     DFS
-     //          call DFSEval
-     //     IDDFS
-     //          call IDDFSEval
-     //     A*
-     //          call A*Eval
      //Print the solution to stdout and to a file.
+
      return 0;
 }
 
@@ -104,6 +134,7 @@ Node::Node() {
      rBoats = 0;
      parent = NULL;
      priority = 0;
+     depth = 0;
 }
 
 Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
@@ -116,6 +147,7 @@ Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
      rBoats = rb;
      parent = pp;
      priority = p;
+     depth = pp->depth + 1;
 }
 
 Node::Node(char leftChars[50], char rightChars[50]) {
@@ -142,6 +174,7 @@ Node::Node(char leftChars[50], char rightChars[50]) {
 
      parent = NULL;
      priority = 0;
+     depth = 0;
 }
 
 std::string Node::toString() {
@@ -160,6 +193,32 @@ std::string Node::toString() {
      s += "\n";
      return s;
 }
+
+std::string bfsEval(Node initialNode, Node goalNode) {
+     std::string returnString("");
+     int nodesExpanded = 0, solutionLength;
+
+     if (isGoal(initialNode, goalNode)) {
+          solutionLength = 1;
+          returnString += initialNode.toString();
+     } else {
+          //Make the expanded nodes map
+	  std::map<std::string, struct Successor> expendedNodes;
+
+	  //Make the priority queue.
+	  std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(bfsCmp);
+	  //loop over the priority queue until we find a solution on the queue.
+     }
+
+     returnString += "\nnodes expanded: ";
+     returnString += std::to_string(nodesExpanded);
+     returnString += "\nnodes in solution: ";
+     returnString += std::to_string(solutionLength);
+     returnString += "\n";
+
+     return returnString;
+}
+
 
 int astarHeuristic(Node checkNode, Node goalNode){
     int diff = 0;
@@ -182,3 +241,102 @@ bool isGoal(Node checkNode, Node goalNode){
     else
         return false;
 }
+
+bool isValid(Node parent, int lc, int lw, int lb, int rc, int rw, int rb){
+        //Check for negative values
+        if (lc < 0 || lw < 0|| lb < 0 || rc < 0 || rw < 0 || rb <0)
+            return false;
+        //Check for more wolves than chickens
+        if (lc < lw)
+            return false;
+        if (rc < rw)
+            return false;
+
+    return true;
+}
+
+struct Successor bfsSuccessor(Node* parent){
+    struct Successor succ; //return successors
+    int lc, lw, lb, rc, rw, rb; //Temp values
+
+    //Move one chicken
+    lc = parent->lChickens - (parent->lBoats) + (parent->rBoats);
+    lw = parent->lWolves;
+    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    rc = parent->rChickens + (parent->lBoats) - (parent.rBoats);
+    rw = parent->rWolves;
+    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.c = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+    }
+    else{
+        succ.c = new Node();
+    }
+
+    //Move two chickens
+    lc = parent->lChickens - 2*(parent->lBoats) + 2*(parent->rBoats);
+    lw = parent->lWolves;
+    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    rc = parent->rChickens + 2*(parent->lBoats) - 2*(parent.rBoats);
+    rw = parent->rWolves;
+    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.cc = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+    }
+    else{
+        succ.cc = new Node();
+    }
+
+    //Move  one wolf
+    lc = parent->lChickens;
+    lw = parent->lWolves - (parent->lBoats) + (parent->rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    rc = parent->rChickens;
+    rw = parent->rWolves + (parent->lBoats) - (parent->rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.w = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+    }
+    else{
+        succ.w = new Node();
+    }
+
+    //Move one chicken, one wolf
+    lc = parent->lChickens - (parent->lBoats) + (parent->rBoats);
+    lw = parent->lWolves - (parent->lBoats) + (parent->rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    rc = parent->rChickens + (parent->lBoats) - (parent.rBoats);
+    rw = parent->rWolves + (parent->lBoats) - (parent->rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.wc = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+    }
+    else{
+        succ.wc = new Node();
+    }
+
+    //Move  two wolf
+    lc = parent->lChickens;
+    lw = parent->lWolves - 2*(parent->lBoats) + 2*(parent->rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    rc = parent->rChickens;
+    rw = parent->rWolves + 2*(parent->lBoats) - 2*(parent->rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    //If math adds up, create a node
+    if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
+        succ.ww = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+    }
+    else{
+        succ.ww = new Node();
+    }
+
+    return succ;
+}
+
+
+
+//  fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
