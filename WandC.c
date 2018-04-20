@@ -39,11 +39,16 @@ struct Successor {
 //     The returned string should be a composition of all of the toStrings
 //     from the found goal node all the way back up to the root node.
 //     Expanded node list maps std::string to Node[5]
+
 //Four successor functions.
 //     Returns the nodes that can be reached from a given node.
 //     This will return a Successor type
+
 //A single is goal node
 //     bool matches(Node n, Node g)
+bool isGoal(Node checkNode, Node goalNode);
+
+int astarHeuristic(Node checkNode, Node goalNode);
 
 int main(int argc, char** argv) {
      FILE * filePointer;
@@ -74,7 +79,7 @@ int main(int argc, char** argv) {
 
      fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
 
-
+    
      //Switch on the modde
      //     BFS
      //          call BFSEval
@@ -153,4 +158,26 @@ std::string Node::toString() {
      s += std::to_string(rBoats);
      s += "\n";
      return s;
+}
+
+int astarHeuristic(Node checkNode, Node goalNode){
+    int diff = 0;
+
+    // Add all differences betweeen the two node states
+    diff += abs(goalNode.lChickens - checkNode.lChickens);
+    diff += abs(goalNode.lWolves - checkNode.lWolves);
+    diff += abs(goalNode.lBoats - checkNode.lBoats);
+    diff += abs(goalNode.rChickens - checkNode.rChickens);
+    diff += abs(goalNode.rWolves - checkNode.rWolves);
+    diff += abs(goalNode.rBoats - checkNode.rBoats);
+
+return diff;
+}
+
+bool isGoal(Node checkNode, Node goalNode){
+    //Check differences between states
+    if (astarHeuristic(checkNode, goalNode) == 0)
+        return true;
+    else
+        return false;
 }
