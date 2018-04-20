@@ -7,7 +7,7 @@ class Node {
      public:
 	  Node();
 	  Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p);
-	  Node(char tempArray[100]);
+	  Node(char leftChars[50], char rightChars[50]);
 
 	  int lChickens;
 	  int lWolves;
@@ -29,7 +29,8 @@ class Node {
 
 int main(int argc, char** argv) {
      FILE * filePointer;
-     char tempArray[100];
+     char leftChars[50];
+     char rightChars[50];
      
      //Get the initial node
      filePointer = fopen(argv[1], "r");
@@ -37,8 +38,10 @@ int main(int argc, char** argv) {
           fprintf(stderr, "Error opening the initialization file\n");
 	  fprintf(stderr, "%s\n", argv[1]);
      }
-     fgets(tempArray, 100, filePointer);
-     Node initNode(tempArray);
+     fgets(leftChars, 50, filePointer);
+     fgets(rightChars, 50, filePointer);
+     Node initNode(leftChars, rightChars);
+     fclose(filePointer);
 
      //Get the goal node.
      filePointer = fopen(argv[2], "r");
@@ -46,8 +49,10 @@ int main(int argc, char** argv) {
           fprintf(stderr, "Error opening the goal file\n");
 	  fprintf(stderr, "%s\n", argv[2]);
      }
-     fgets(tempArray, 100, filePointer);
-     Node goalNode(tempArray);
+     fgets(leftChars, 50, filePointer);
+     fgets(rightChars, 50, filePointer);
+     Node goalNode(leftChars, rightChars);
+     fclose(filePointer);
 
      fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
 
@@ -86,7 +91,7 @@ Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
      priority = p;
 }
 
-Node::Node(char tempArray[100]) { 
+Node::Node(char leftChars[50], char rightChars[50]) { 
      //Parse the character array
      lChickens = 0;
      lWolves = 0;
