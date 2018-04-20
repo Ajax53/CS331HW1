@@ -1,11 +1,12 @@
-#include <vector> //For the priority queue generation
-#include <queue>  //For the priority queue generation
-#include <cstdio> //For fprintf and FILE* streams.
-#include <stdio.h> //For strtok
-#include <string.h> //For strtok
-#include <cstdio> //For fprintf and FILE* streams.
-#include <string> //For the toString function. And generally passing things around.
-#include <map>    //For the already expanded nodes container.
+#include <vector>  //For the priority queue generation
+#include <queue>   //For the priority queue generation
+#include <cstdio>  //For fprintf and FILE* streams.
+//#include <stdio.h> //For strtok this is cstdio
+//#include <string.h> //For strtok this is cstring
+#include <cstdio>  //For fprintf and FILE* streams.
+#include <cstring> //For the strtok. In c++ you want to include these instead of .h files
+#include <string>  //For the toString function. And generally passing things around.
+#include <map>     //For the already expanded nodes container.
 
 class Node {
      public:
@@ -13,6 +14,7 @@ class Node {
 	  Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p);
 	  Node(char leftChars[50], char rightChars[50]);
 
+	  bool exists;
 	  int lChickens;
 	  int lWolves;
 	  int lBoats;
@@ -87,6 +89,7 @@ int main(int argc, char** argv) {
 }
 
 Node::Node() {
+     exists = false;
      lChickens = 0;
      lWolves = 0;
      lBoats = 0;
@@ -98,7 +101,9 @@ Node::Node() {
 }
 
 Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
-
+     exists = true;
+     lChickens = lc;
+     lWolves = lw;
      lBoats = lb;
      rChickens = rc;
      rWolves = rw;
@@ -110,23 +115,23 @@ Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
 Node::Node(char leftChars[50], char rightChars[50]) {
      //Parse the character array
      char * pch;
-     pch = strtok (leftChars,", ");
+     pch = strtok(leftChars, ", ");
      lChickens = atoi(pch);
 
-     pch = strtok (NULL, " ,");
+     pch = strtok(NULL, " ,");
      lWolves = atoi(pch);
 
-     pch = strtok (NULL, " ,");
+     pch = strtok(NULL, " ,");
      lBoats = atoi(pch);
 
 
-     pch = strtok (rightChars,", ");
+     pch = strtok(rightChars, ", ");
      rChickens = atoi(pch);
 
-     pch = strtok (NULL, " ,");
+     pch = strtok(NULL, " ,");
      rWolves = atoi(pch);
 
-     pch = strtok (NULL, " ,");
+     pch = strtok(NULL, " ,");
      rBoats = atoi(pch);
 
      parent = NULL;
