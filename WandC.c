@@ -37,8 +37,8 @@ struct Successor {
 };
 
 //Comparison functions
-bool bfsCmp(Node lhs, Node rhs) { return lhs.depth < rhs.depth; }
-bool dfsCmp(Node lhs, Node rhs) { return lhs.depth > rhs.depth; }
+bool bfsCmp(Node lhs, Node rhs) { return lhs.priority < rhs.priority; }
+bool dfsCmp(Node lhs, Node rhs) { return lhs.priority > rhs.priority; }
 
 //Four evaluation functions.
 //     Returning a string that represents the path to the optimal solution.
