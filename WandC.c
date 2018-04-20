@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
      fgets(tempArray, 100, filePointer);
      Node goalNode(tempArray);
 
-     fprintf(stdout, "%s\n%s\n", initNode.toString(), goalNode.toString());
+     fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
 
 
      //Switch on the modde
@@ -77,8 +77,7 @@ Node::Node() {
 }
 
 Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
-     lChickens = ls;
-     lWolves = lw;
+
      lBoats = lb;
      rChickens = rc;
      rWolves = rw;
@@ -99,8 +98,20 @@ Node::Node(char tempArray[100]) {
      priority = 0;
 }
 
-string Node::toString() {
-     std::string s(lChickens, ",", lWolves, ",", lBoats, "\n", rChickens, ",", rWolves, ",", rBoats);
+std::string Node::toString() {
+     std::string s;
+     s += std::to_string(lChickens);
+     s += ",";
+     s += std::to_string(lWolves);
+     s += ",";
+     s += std::to_string(lBoats);
+     s += "\n";
+     s += std::to_string(rChickens);
+     s += ",";
+     s += std::to_string(rWolves);
+     s += ",";
+     s += std::to_string(rBoats);
+     s += "\n";
      return s;
 }
 
