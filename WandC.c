@@ -25,6 +25,7 @@ class Node {
 	  int depth;
 
 	  std::string toString();
+	  std::string getPathString();
 };
 
 struct Successor {
@@ -194,21 +195,53 @@ std::string Node::toString() {
      return s;
 }
 
+std::string Node::getPathString() {
+     std::string returnString("");
+     if (parent == NULL) {
+          returnString += this->toString();
+     } else {
+          returnString += this->toString();
+	  returnString += "\n";
+	  returnString += this->parent->getPathString();
+	  returnString += "\n";
+     }
+     return returnString;
+}
+
 std::string bfsEval(Node initialNode, Node goalNode) {
      std::string returnString("");
      int nodesExpanded = 0, solutionLength;
 
-     if (isGoal(initialNode, goalNode)) {
-          solutionLength = 1;
-          returnString += initialNode.toString();
-     } else {
-          //Make the expanded nodes map
-	  std::map<std::string, struct Successor> expendedNodes;
+     //Make the expanded nodes map
+     std::map<std::string, struct Successor> expandedNodes;
 
-	  //Make the priority queue.
-	  std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(bfsCmp);
-	  //loop over the priority queue until we find a solution on the queue.
+     //Make the priority queue.
+     std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(bfsCmp);
+
+     //loop over the priority queue until we find a solution on the queue.
+     fringe.push(initialNode);
+
+     while (!isGoal(fringe.top(), goalNode)) {
+          Node tempNode = fringe.top();
+	        fringe.pop();
+
+          if (expandedNodes.find(tempNode.toString()) == expandedNodes.end()) {
+	            nodesExpanded++;
+	            struct Successor s = bfsSuccessor(&tempNode);
+	            expandedNodes[tempNode.toString()] = s;
+
+	            if (s.c.exists) fringe.push(s.c);
+	            if (s.cc.exists) fringe.push(s.cc);
+	            if (s.w.exists) fringe.push(s.w);
+	            if (s.wc.exists) fringe.push(s.w);
+	            if (s.ww.exists) fringe.push(s.ww);
+	       }
      }
+
+     Node tempNode = fringe.top();
+
+     solutionLength = tempNode.depth + 1;
+     returnString += tempNode.getPathString();
 
      returnString += "\nnodes expanded: ";
      returnString += std::to_string(nodesExpanded);
@@ -262,81 +295,77 @@ struct Successor bfsSuccessor(Node* parent){
     //Move one chicken
     lc = parent->lChickens - (parent->lBoats) + (parent->rBoats);
     lw = parent->lWolves;
-    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
-    rc = parent->rChickens + (parent->lBoats) - (parent.rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens + (parent->lBoats) - (parent->rBoats);
     rw = parent->rWolves;
-    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        succ.c = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+        succ.c = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
-        succ.c = new Node();
+        succ.c = Node();
     }
 
     //Move two chickens
     lc = parent->lChickens - 2*(parent->lBoats) + 2*(parent->rBoats);
     lw = parent->lWolves;
-    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
-    rc = parent->rChickens + 2*(parent->lBoats) - 2*(parent.rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens + 2*(parent->lBoats) - 2*(parent->rBoats);
     rw = parent->rWolves;
-    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        succ.cc = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+        succ.cc = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
-        succ.cc = new Node();
+        succ.cc = Node();
     }
 
     //Move  one wolf
     lc = parent->lChickens;
     lw = parent->lWolves - (parent->lBoats) + (parent->rBoats);
-    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
     rc = parent->rChickens;
     rw = parent->rWolves + (parent->lBoats) - (parent->rBoats);
-    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        succ.w = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+        succ.w = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
-        succ.w = new Node();
+        succ.w = Node();
     }
 
     //Move one chicken, one wolf
     lc = parent->lChickens - (parent->lBoats) + (parent->rBoats);
     lw = parent->lWolves - (parent->lBoats) + (parent->rBoats);
-    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
-    rc = parent->rChickens + (parent->lBoats) - (parent.rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
+    rc = parent->rChickens + (parent->lBoats) - (parent->rBoats);
     rw = parent->rWolves + (parent->lBoats) - (parent->rBoats);
-    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        succ.wc = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+        succ.wc =  Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
-        succ.wc = new Node();
+        succ.wc =  Node();
     }
 
     //Move  two wolf
     lc = parent->lChickens;
     lw = parent->lWolves - 2*(parent->lBoats) + 2*(parent->rBoats);
-    lb = parent->lBoats - (parent->lBoats) + (parent.rBoats);
+    lb = parent->lBoats - (parent->lBoats) + (parent->rBoats);
     rc = parent->rChickens;
     rw = parent->rWolves + 2*(parent->lBoats) - 2*(parent->rBoats);
-    rb = parent->rBoats + (parent->lBoats) - (parent.rBoats);
+    rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        succ.ww = new Node(lc, lw, lb, rc, rw, rb, *parent, parent->depth +1);
+        succ.ww = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
-        succ.ww = new Node();
+        succ.ww = Node();
     }
 
     return succ;
 }
-
-
-
-//  fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
