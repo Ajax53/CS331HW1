@@ -54,7 +54,7 @@ std::string astarEval(Node initialNode, Node goalNode);
 //     Returns the nodes that can be reached from a given node.
 //     This will return a Successor struct
 
-struct Successor bfsSuccessor(Node *parent);
+struct Successor depthSuccessor(Node *parent);
 struct Successor dfsSuccessor(Node *parent);
 struct Successor iddfsSuccessor(Node *parent);
 struct Successor astarSuccessor(Node *parent);
@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
      filePointer = fopen(argv[4], "w");
      if (filePointer == NULL) {
           fprintf(stderr, "Error opening the output file\n");
-	  fprintf(stderr, "%s\n", argv[4]);
+	      fprintf(stderr, "%s\n", argv[4]);
           return 1;
      }
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 	       fprintf(stdout, "DFS!\n");
 	       break;
 	  case 'i':
-               fprintf(stdout, "IDDFS!\n");
+           fprintf(stdout, "IDDFS!\n");
 	       break;
 	  case 'a':
 	       fprintf(stdout, "ASTAR!\n");
@@ -217,12 +217,11 @@ std::string Node::toString() {
 std::string Node::getPathString() {
      std::string returnString("");
      if (parent == NULL) {
-          returnString += this->toString();
+        returnString += this->toString();
      } else {
-          returnString += this->toString();
-	  returnString += "\n";
-	  returnString += this->parent->getPathString();
-	  returnString += "\n";
+        returnString += this->toString();
+        returnString += "\n";
+        returnString += this->parent->getPathString();
      }
      return returnString;
 }
@@ -232,7 +231,7 @@ std::string bfsEval(Node initialNode, Node goalNode) {
      int nodesExpanded = 0, solutionLength;
 
      //Make the expanded nodes map
-     std::map<std::string, struct Successor> expandedNodes;
+     std::map<std::string, Node*> expandedNodes;
 
      //Make the priority queue.
      std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(bfsCmp);
@@ -241,16 +240,13 @@ std::string bfsEval(Node initialNode, Node goalNode) {
      fringe.push(initialNode);
 
      while (!isGoal(fringe.top(), goalNode)) {
-          Node tempNode = fringe.top();
+          Node *tempNode = new Node(fringe.top());
           fringe.pop();
 
-          fprintf(stderr, "Fringe size after pop: %lu\n", fringe.size());
-          fprintf(stderr, "Expanding node:\n%s\n", tempNode.toString().c_str());
-
-          if (expandedNodes.find(tempNode.toString()) == expandedNodes.end()) {
+          if (expandedNodes.find(tempNode->toString()) == expandedNodes.end()) {
                nodesExpanded++;
-	           struct Successor s = bfsSuccessor(&tempNode);
-	           expandedNodes[tempNode.toString()] = s;
+	           struct Successor s = depthSuccessor(tempNode);
+	           expandedNodes[tempNode->toString()] = tempNode;
 
 	           if (s.c.exists) {
                    fringe.push(s.c);
@@ -267,9 +263,7 @@ std::string bfsEval(Node initialNode, Node goalNode) {
 	           if (s.ww.exists) {
                    fringe.push(s.ww);
                }
-	       } else {
-                fprintf(stderr, "Already expanded this node.\n");
-           }
+	       }
 
            if (fringe.empty()) {
                 returnString += "No solution found\nNodes expanded: ";
@@ -328,7 +322,7 @@ bool isValid(Node parent, int lc, int lw, int lb, int rc, int rw, int rb){
     return true;
 }
 
-struct Successor bfsSuccessor(Node* parent){
+struct Successor depthSuccessor(Node* parent){
     struct Successor succ; //return successors
     int lc, lw, lb, rc, rw, rb; //Temp values
 
@@ -341,7 +335,6 @@ struct Successor bfsSuccessor(Node* parent){
     rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        fprintf(stderr, "Valid chicken move\n");
         succ.c = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
@@ -357,7 +350,6 @@ struct Successor bfsSuccessor(Node* parent){
     rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        fprintf(stderr, "Valid 2xchicken move\n");
         succ.cc = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
@@ -373,7 +365,6 @@ struct Successor bfsSuccessor(Node* parent){
     rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        fprintf(stderr, "Valid wolf move\n");
         succ.w = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
@@ -389,7 +380,6 @@ struct Successor bfsSuccessor(Node* parent){
     rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        fprintf(stderr, "Valid wolf chicken move\n");
         succ.wc =  Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
@@ -405,7 +395,6 @@ struct Successor bfsSuccessor(Node* parent){
     rb = parent->rBoats + (parent->lBoats) - (parent->rBoats);
     //If math adds up, create a node
     if (isValid(*parent, lc, lw, lb, rc, rw, rb) == true){
-        fprintf(stderr, "Valid 2xwolf move\n");
         succ.ww = Node(lc, lw, lb, rc, rw, rb, parent, parent->depth +1);
     }
     else{
