@@ -85,6 +85,7 @@ int main(int argc, char** argv) {
      if (filePointer == NULL) {
           fprintf(stderr, "Error opening the initialization file\n");
 	  fprintf(stderr, "%s\n", argv[1]);
+	  return 1;
      }
      fgets(leftChars, 50, filePointer);
      fgets(rightChars, 50, filePointer);
@@ -96,16 +97,28 @@ int main(int argc, char** argv) {
      if (filePointer == NULL) {
           fprintf(stderr, "Error opening the goal file\n");
 	  fprintf(stderr, "%s\n", argv[2]);
+	  return 1;
      }
      fgets(leftChars, 50, filePointer);
      fgets(rightChars, 50, filePointer);
      Node goalNode(leftChars, rightChars);
      fclose(filePointer);
 
+     std::string evaluationResult;
+
+     //Opening the output file here so we don't go through
+     //the whole problem only to not be able to output at the end.
+     filePointer = fopen(argv[4], "w");
+     if (filePointer == NULL) {
+          fprintf(stderr, "Error opening the output file\n");
+	  fprintf(stderr, "%s\n", argv[4]);
+          return 1; 
+     }
+
      //Switch on the mode
      switch (argv[3][0]) {
 	  case 'b':
-	       fprintf(stdout, "BFS!\n");
+	       evaluationResult = bfsEval(initNode, goalNode);
 	       break;
 	  case 'd':
 	       fprintf(stdout, "DFS!\n");
@@ -121,6 +134,10 @@ int main(int argc, char** argv) {
      }
 
      //Print the solution to stdout and to a file.
+     fprintf(stdout, "%s/n", evaluationResult.c_str());
+     fprintf(filePointer, "%s/n", evaluationResult.c_str());
+
+     fclose(filePointer);
 
      return 0;
 }
