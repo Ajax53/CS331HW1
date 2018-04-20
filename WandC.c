@@ -5,6 +5,10 @@
 
 class Node {
      public:
+	  Node();
+	  Node(int lc, int lw, int lb, int rc, int rw, int rb, int p);
+	  Node(char tempArray[100]);
+
 	  int lChickens;
 	  int lWolves;
 	  int lBoats;
@@ -24,8 +28,27 @@ class Node {
 //     bool matches(Node n, Node g)
 
 int main(int argc, char** argv) {
-     //Get the intial nodes
+     FILE * filePointer;
+     char tempArray[100];
+     
+     //Get the initial node
+     filePointer = fopen(argv[1], "r");
+     if (filePointer == NULL) {
+          fprintf(stderr, "Error opening the initialization file\n");
+	  fprintf(stderr, "%s\n", argv[1]);
+     }
+     fgets(tempArray, 100, filePointer);
+     Node initNode(tempArray);
+
      //Get the goal node.
+     filePointer = fopen(argv[2], "r");
+     if (filePointer == NULL) {
+          fprintf(stderr, "Error opening the goal file\n");
+	  fprintf(stderr, "%s\n", argv[2]);
+     }
+     fgets(tempArray, 100, filePointer);
+     Node goalNode(tempArray);
+
      //Switch on the modde
      //     BFS
      //          call BFSEval
