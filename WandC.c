@@ -36,6 +36,12 @@ struct Successor {
      Node ww;
 };
 
+struct iterativeDeepening {
+     std::string value;
+     int nodesExpanded;
+     bool finished;
+};
+
 //Comparison functions
 bool bfsCmp(Node lhs, Node rhs) { return lhs.priority < rhs.priority; }
 bool dfsCmp(Node lhs, Node rhs) { return lhs.priority > rhs.priority; }
@@ -47,7 +53,7 @@ bool dfsCmp(Node lhs, Node rhs) { return lhs.priority > rhs.priority; }
 //     Expanded node list maps std::string to Node[5] (struct Successor)
 std::string bfsEval(Node initialNode, Node goalNode);
 std::string dfsEval(Node initialNode, Node goalNode);
-std::string iddfsEval(Node initialNode, Node goalNode);
+struct iterativeDeepening iddfsEval(Node initialNode, Node goalNode, int depthLimit, struct iterativeDeepening oldValues);
 std::string astarEval(Node initialNode, Node goalNode);
 
 //two successor functions.
@@ -57,7 +63,7 @@ std::string astarEval(Node initialNode, Node goalNode);
 //     the nodes which is just depth in the first three cases. 
 
 struct Successor depthSuccessor(Node *parent);
-struct Successor astarSuccessor(Node *parent);
+struct Successor astarSuccessor(Node *parent, Node goalNode);
 
 //A single is goal node
 //     bool matches(Node n, Node g)
@@ -105,6 +111,9 @@ int main(int argc, char** argv) {
      fclose(filePointer);
 
      std::string evaluationResult;
+     struct iterativeDeepening resultStruct;
+     resultStruct.nodesExpanded = 0;
+     int depthLimit;
 
      //Opening the output file here so we don't go through
      //the whole problem only to not be able to output at the end.
@@ -121,13 +130,23 @@ int main(int argc, char** argv) {
 	       evaluationResult = bfsEval(initNode, goalNode);
 	       break;
 	  case 'd':
-	       fprintf(stdout, "DFS!\n");
+	       evaluationResult = dfsEval(initNode, goalNode);
 	       break;
 	  case 'i':
-           fprintf(stdout, "IDDFS!\n");
+           depthLimit = 0;
+           resultStruct = iddfsEval(initNode, goalNode, depthLimit, resultStruct);
+           while (strcmp(evaluationResult.c_str(), "") == 0) {
+               depthLimit++;
+               resultStruct = iddfsEval(initNode, goalNode, depthLimit, resultStruct);
+               if (depthLimit > 20000) {
+                   fprintf(stderr, "This is getting out of hand. Cancelling.\n");
+                   return 1;
+               }
+               evaluationResult = resultStruct.value;
+           }
 	       break;
 	  case 'a':
-	       fprintf(stdout, "ASTAR!\n");
+	       evaluationResult = astarEval(initNode, goalNode);
 	       break;
 	  default:
 	       fprintf(stdout, "Please enter a valid mode. (bfs, dfs, iddfs, astar)\n");
@@ -326,10 +345,10 @@ std::string dfsEval(Node initialNode, Node goalNode) {
      return returnString;
 }
 
-std::string iddfsEval(Node initialNode, Node goalNode) {
+struct iterativeDeepening iddfsEval(Node initialNode, Node goalNode, int depthLimit, struct iterativeDeepening oldValues) {
      std::string returnString("");
      int nodesExpanded = 0, solutionLength;
-     int depthLimit = 0;
+     struct iterativeDeepening returnStruct;
 
      //Make the expanded nodes map
      std::map<std::string, Node*> expandedNodes;
@@ -357,11 +376,61 @@ std::string iddfsEval(Node initialNode, Node goalNode) {
 	       }
 
            if (fringe.empty()) {
-                depthLimit++;
-                expandedNodes.clear();
+                returnStruct.value = "";
+                returnStruct.nodesExpanded = oldValues.nodesExpanded + nodesExpanded;
+                returnStruct.finished = false;
+                return returnStruct;
            }
-           
-           if (depthLimit == 20000) {
+     }
+
+     Node tempNode = fringe.top();
+
+     solutionLength = tempNode.depth + 1;
+     returnString += tempNode.getPathString();
+
+     returnString += "\nnodes expanded: ";
+     returnString += std::to_string(nodesExpanded + oldValues.nodesExpanded);
+     returnString += "\nnodes in solution: ";
+     returnString += std::to_string(solutionLength);
+     returnString += "\n";
+
+     returnStruct.value = returnString;
+     returnStruct.nodesExpanded = oldValues.nodesExpanded + nodesExpanded;
+     returnStruct.finished = true;
+     
+     return returnStruct;
+}
+
+std::string astarEval(Node initialNode, Node goalNode) {
+     std::string returnString("");
+     int nodesExpanded = 0, solutionLength;
+
+     //Make the expanded nodes map
+     std::map<std::string, Node*> expandedNodes;
+
+     //Make the priority queue.
+     std::priority_queue<Node, std::vector<Node>, std::function<bool(Node, Node)>> fringe(dfsCmp);
+
+     //loop over the priority queue until we find a solution on the queue.
+     fringe.push(initialNode);
+
+     while (!isGoal(fringe.top(), goalNode)) {
+          Node *tempNode = new Node(fringe.top());
+          fringe.pop();
+
+          if (expandedNodes.find(tempNode->toString()) == expandedNodes.end()) {
+               nodesExpanded++;
+	           struct Successor s = astarSuccessor(tempNode, goalNode);
+	           expandedNodes[tempNode->toString()] = tempNode;
+
+	           if (s.c.exists) fringe.push(s.c);
+	           if (s.cc.exists) fringe.push(s.cc);
+	           if (s.w.exists) fringe.push(s.w);
+	           if (s.wc.exists) fringe.push(s.wc);
+	           if (s.ww.exists) fringe.push(s.ww);
+	       }
+
+           if (fringe.empty()) {
                 returnString += "No solution found\nNodes expanded: ";
                 returnString += std::to_string(nodesExpanded);
                 return returnString;
