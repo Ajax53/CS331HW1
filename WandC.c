@@ -1,7 +1,8 @@
 #include <vector> //For the priority queue generation
 #include <queue>  //For the priority queue generation
 #include <cstdio> //For fprintf and FILE* streams. 
-#include <string> //For the toString function. And generally passing things around. 
+#include <string> //For the toString function. And generally passing things around.
+#include <map>    //For the already expanded nodes container.
 
 class Node {
      public:
@@ -20,10 +21,22 @@ class Node {
 	  std::string toString();
 };
 
+struct Successor {
+     Node c;
+     Node cc;
+     Node w;
+     Node wc;
+     Node ww;
+};
+
 //Four evaluation functions.
 //     Returning a string that represents the path to the optimal solution.
+//     The returned string should be a composition of all of the toStrings
+//     from the found goal node all the way back up to the root node.
+//     Expanded node list maps std::string to Node[5] 
 //Four successor functions.
 //     Returns the nodes that can be reached from a given node. 
+//     This will return a Successor type
 //A single is goal node
 //     bool matches(Node n, Node g)
 
