@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
      if (filePointer == NULL) {
           fprintf(stderr, "Error opening the output file\n");
 	  fprintf(stderr, "%s\n", argv[4]);
-          return 1; 
+          return 1;
      }
 
      //Switch on the mode
@@ -247,10 +247,12 @@ std::string bfsEval(Node initialNode, Node goalNode) {
 	            struct Successor s = bfsSuccessor(&tempNode);
 	            expandedNodes[tempNode.toString()] = s;
 
+                fprintf(stdout, "Expanding node: %s", std::to_string(tempNode.toString());
+
 	            if (s.c.exists) fringe.push(s.c);
 	            if (s.cc.exists) fringe.push(s.cc);
 	            if (s.w.exists) fringe.push(s.w);
-	            if (s.wc.exists) fringe.push(s.w);
+	            if (s.wc.exists) fringe.push(s.wc);
 	            if (s.ww.exists) fringe.push(s.ww);
 	       }
      }
