@@ -1,7 +1,10 @@
 #include <vector> //For the priority queue generation
 #include <queue>  //For the priority queue generation
-#include <cstdio> //For fprintf and FILE* streams. 
-#include <string> //For the toString function. And generally passing things around. 
+#include <cstdio> //For fprintf and FILE* streams.
+#include <string> //For the toString function. And generally passing things around.
+#include <stdio.h> //For strtok
+#include <string.h>//For strtok
+
 
 class Node {
      public:
@@ -23,14 +26,14 @@ class Node {
 //Four evaluation functions.
 //     Returning a string that represents the path to the optimal solution.
 //Four successor functions.
-//     Returns the nodes that can be reached from a given node. 
+//     Returns the nodes that can be reached from a given node.
 //A single is goal node
 //     bool matches(Node n, Node g)
 
 int main(int argc, char** argv) {
      FILE * filePointer;
      char tempArray[100];
-     
+
      //Get the initial node
      filePointer = fopen(argv[1], "r");
      if (filePointer == NULL) {
@@ -61,7 +64,7 @@ int main(int argc, char** argv) {
      //          call IDDFSEval
      //     A*
      //          call A*Eval
-     //Print the solution to stdout and to a file. 
+     //Print the solution to stdout and to a file.
      return 0;
 }
 
@@ -86,8 +89,21 @@ Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
      priority = p;
 }
 
-Node::Node(char tempArray[100]) { 
+Node::Node(char tempArray[100]) {
      //Parse the character array
+
+
+       char str[] ="- This, a sample string.";
+       char * pch;
+       printf ("Splitting string \"%s\" into tokens:\n",str);
+       pch = strtok (tempArray,", ");
+       while (pch != NULL)
+       {
+         printf ("%s\n",pch);
+         pch = strtok (NULL, " ,.-");
+       }
+
+
      lChickens = 0;
      lWolves = 0;
      lBoats = 0;
@@ -96,6 +112,8 @@ Node::Node(char tempArray[100]) {
      rBoats = 0;
      parent = NULL;
      priority = 0;
+
+
 }
 
 std::string Node::toString() {
@@ -114,4 +132,3 @@ std::string Node::toString() {
      s += "\n";
      return s;
 }
-
