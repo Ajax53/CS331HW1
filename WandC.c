@@ -1,16 +1,17 @@
 #include <vector> //For the priority queue generation
 #include <queue>  //For the priority queue generation
 #include <cstdio> //For fprintf and FILE* streams.
-#include <string> //For the toString function. And generally passing things around.
 #include <stdio.h> //For strtok
-#include <string.h>//For strtok
-
+#include <string.h> //For strtok
+#include <cstdio> //For fprintf and FILE* streams.
+#include <string> //For the toString function. And generally passing things around.
+#include <map>    //For the already expanded nodes container.
 
 class Node {
      public:
 	  Node();
 	  Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p);
-	  Node(char tempArray[100]);
+	  Node(char leftChars[50], char rightChars[50]);
 
 	  int lChickens;
 	  int lWolves;
@@ -23,16 +24,29 @@ class Node {
 	  std::string toString();
 };
 
+struct Successor {
+     Node c;
+     Node cc;
+     Node w;
+     Node wc;
+     Node ww;
+};
+
 //Four evaluation functions.
 //     Returning a string that represents the path to the optimal solution.
+//     The returned string should be a composition of all of the toStrings
+//     from the found goal node all the way back up to the root node.
+//     Expanded node list maps std::string to Node[5]
 //Four successor functions.
 //     Returns the nodes that can be reached from a given node.
+//     This will return a Successor type
 //A single is goal node
 //     bool matches(Node n, Node g)
 
 int main(int argc, char** argv) {
      FILE * filePointer;
-     char tempArray[100];
+     char leftChars[50];
+     char rightChars[50];
 
      //Get the initial node
      filePointer = fopen(argv[1], "r");
@@ -40,8 +54,10 @@ int main(int argc, char** argv) {
           fprintf(stderr, "Error opening the initialization file\n");
 	  fprintf(stderr, "%s\n", argv[1]);
      }
-     fgets(tempArray, 100, filePointer);
-     Node initNode(tempArray);
+     fgets(leftChars, 50, filePointer);
+     fgets(rightChars, 50, filePointer);
+     Node initNode(leftChars, rightChars);
+     fclose(filePointer);
 
      //Get the goal node.
      filePointer = fopen(argv[2], "r");
@@ -49,8 +65,10 @@ int main(int argc, char** argv) {
           fprintf(stderr, "Error opening the goal file\n");
 	  fprintf(stderr, "%s\n", argv[2]);
      }
-     fgets(tempArray, 100, filePointer);
-     Node goalNode(tempArray);
+     fgets(leftChars, 50, filePointer);
+     fgets(rightChars, 50, filePointer);
+     Node goalNode(leftChars, rightChars);
+     fclose(filePointer);
 
      fprintf(stdout, "%s\n%s\n", initNode.toString().c_str(), goalNode.toString().c_str());
 
@@ -89,31 +107,30 @@ Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
      priority = p;
 }
 
-Node::Node(char tempArray[100]) {
+Node::Node(char leftChars[50], char rightChars[50]) {
      //Parse the character array
+     char * pch;
+     pch = strtok (leftChars,", ");
+     lChickens = atoi(pch);
+
+     pch = strtok (NULL, " ,");
+     lWolves = atoi(pch);
+
+     pch = strtok (NULL, " ,");
+     lBoats = atoi(pch);
 
 
-       char str[] ="- This, a sample string.";
-       char * pch;
-       printf ("Splitting string \"%s\" into tokens:\n",str);
-       pch = strtok (tempArray,", ");
-       while (pch != NULL)
-       {
-         printf ("%s\n",pch);
-         pch = strtok (NULL, " ,.-");
-       }
+     pch = strtok (rightChars,", ");
+     rChickens = atoi(pch);
 
+     pch = strtok (NULL, " ,");
+     rWolves = atoi(pch);
 
-     lChickens = 0;
-     lWolves = 0;
-     lBoats = 0;
-     rChickens = 0;
-     rWolves = 0;
-     rBoats = 0;
+     pch = strtok (NULL, " ,");
+     rBoats = atoi(pch);
+
      parent = NULL;
      priority = 0;
-
-
 }
 
 std::string Node::toString() {
