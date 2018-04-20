@@ -45,3 +45,8 @@ A consistent heuristic is also admissible
 
 I think this means that we should be able to have h() always return 0 because our cost
 from moving to any node is always 1. 
+
+!!! 
+Better heuristic distance from the goal state.
+if goal is 0,0,0;1,1,1
+and current state is 1,0,0;0,1,1 then you are 1 away from the goal!
