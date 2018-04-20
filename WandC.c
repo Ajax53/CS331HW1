@@ -6,7 +6,7 @@
 class Node {
      public:
 	  Node();
-	  Node(int lc, int lw, int lb, int rc, int rw, int rb, int p);
+	  Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p);
 	  Node(char tempArray[100]);
 
 	  int lChickens;
@@ -61,3 +61,38 @@ int main(int argc, char** argv) {
      //Print the solution to stdout and to a file. 
      return 0;
 }
+
+Node::Node() {
+     lChickens = 0;
+     lWolves = 0;
+     lBoats = 0;
+     rChickens = 0;
+     rWolves = 0;
+     rBoats = 0;
+     parent = NULL;
+     priority = 0;
+}
+
+Node::Node(int lc, int lw, int lb, int rc, int rw, int rb, Node *pp, int p) {
+     lChickens = ls;
+     lWolves = lw;
+     lBoats = lb;
+     rChickens = rc;
+     rWolves = rw;
+     rBoats = rb;
+     parent = pp;
+     priority = p;
+}
+
+Node::Node(char tempArray[100]) { 
+     //Parse the character array
+     lChickens = 0;
+     lWolves = 0;
+     lBoats = 0;
+     rChickens = 0;
+     rWolves = 0;
+     rBoats = 0;
+     parent = NULL;
+     priority = 0;
+}
+
